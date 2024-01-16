@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.watermeter.system.mapper.SysMeterInfoMapper">
+    
+    <resultMap type="SysMeterInfo" id="SysMeterInfoResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="meterAddress"    column="meter_address"    />
+        <result property="detailAddress"    column="detail_address"    />
+        <result property="status"    column="status"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap id="SysMeterInfoSysDeviceDataResult" type="SysMeterInfo" extends="SysMeterInfoResult">
+        <collection property="sysDeviceDataList" notNullColumn="sub_id" javaType="java.util.List" resultMap="SysDeviceDataResult" />
+    </resultMap>
+
+    <resultMap type="SysDeviceData" id="SysDeviceDataResult">
+        <result property="id"    column="sub_id"    />
+        <result property="deviceId"    column="sub_device_id"    />
+        <result property="dataValue"    column="sub_data_value"    />
+        <result property="dateTime"    column="sub_date_time"    />
+    </resultMap>
+
+    <sql id="selectSysMeterInfoVo">
+        select id, user_id, meter_address, detail_address, status, update_time from sys_meter_info
+    </sql>
+
+    <select id="selectSysMeterInfoList" parameterType="SysMeterInfo" resultMap="SysMeterInfoResult">
+        <include refid="selectSysMeterInfoVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="meterAddress != null  and meterAddress != ''"> and meter_address = #{meterAddress}</if>
+            <if test="detailAddress != null  and detailAddress != ''"> and detail_address = #{detailAddress}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysMeterInfoById" parameterType="Long" resultMap="SysMeterInfoSysDeviceDataResult">
+        select a.id, a.user_id, a.meter_address, a.detail_address, a.status, a.update_time,
+ b.id as sub_id, b.device_id as sub_device_id, b.data_value as sub_data_value, b.date_time as sub_date_time
+        from sys_meter_info a
+        left join sys_device_data b on b.device_id = a.id
+        where a.id = #{id}
+    </select>
+        
+    <insert id="insertSysMeterInfo" parameterType="SysMeterInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_meter_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="meterAddress != null">meter_address,</if>
+            <if test="detailAddress != null">detail_address,</if>
+            <if test="status != null">status,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="meterAddress != null">#{meterAddress},</if>
+            <if test="detailAddress != null">#{detailAddress},</if>
+            <if test="status != null">#{status},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysMeterInfo" parameterType="SysMeterInfo">
+        update sys_meter_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="meterAddress != null">meter_address = #{meterAddress},</if>
+            <if test="detailAddress != null">detail_address = #{detailAddress},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysMeterInfoById" parameterType="Long">
+        delete from sys_meter_info where id = #{id}
+    </delete>
+
+    <delete id="deleteSysMeterInfoByIds" parameterType="String">
+        delete from sys_meter_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteSysDeviceDataByDeviceIds" parameterType="String">
+        delete from sys_device_data where device_id in 
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSysDeviceDataByDeviceId" parameterType="Long">
+        delete from sys_device_data where device_id = #{deviceId}
+    </delete>
+
+    <insert id="batchSysDeviceData">
+        insert into sys_device_data( id, device_id, data_value, date_time) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.deviceId}, #{item.dataValue}, #{item.dateTime})
+        </foreach>
+    </insert>
+
+</mapper>

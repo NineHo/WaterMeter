@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.watermeter.system.mapper.SysDeviceDataMapper">
+
+    <resultMap id="BaseResultMap" type="com.watermeter.system.domain.SysDeviceData">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="device_id" column="device_id" jdbcType="VARCHAR"/>
+            <result property="data_value" column="data_value" jdbcType="DOUBLE"/>
+            <result property="date_time" column="date_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,device_id,data_value,
+        date_time
+    </sql>
+</mapper>

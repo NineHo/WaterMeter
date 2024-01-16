@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.watermeter.system.mapper.SysAreaConnectorMapper">
+    
+    <resultMap type="SysAreaConnector" id="SysAreaConnectorResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="area"    column="area"    />
+        <result property="phone"    column="phone"    />
+        <result property="email"    column="email"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectSysAreaConnectorVo">
+        select id, name, area, phone, email, create_time from sys_area_connector
+    </sql>
+
+    <select id="selectSysAreaConnectorList" parameterType="SysAreaConnector" resultMap="SysAreaConnectorResult">
+        <include refid="selectSysAreaConnectorVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="area != null  and area != ''"> and area = #{area}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysAreaConnectorById" parameterType="Long" resultMap="SysAreaConnectorResult">
+        <include refid="selectSysAreaConnectorVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysAreaConnector" parameterType="SysAreaConnector">
+        insert into sys_area_connector
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="area != null and area != ''">area,</if>
+            <if test="phone != null">phone,</if>
+            <if test="email != null">email,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="area != null and area != ''">#{area},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="email != null">#{email},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysAreaConnector" parameterType="SysAreaConnector">
+        update sys_area_connector
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="area != null and area != ''">area = #{area},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysAreaConnectorById" parameterType="Long">
+        delete from sys_area_connector where id = #{id}
+    </delete>
+
+    <delete id="deleteSysAreaConnectorByIds" parameterType="String">
+        delete from sys_area_connector where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

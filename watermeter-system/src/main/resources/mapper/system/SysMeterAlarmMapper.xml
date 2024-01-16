@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.watermeter.system.mapper.SysMeterAlarmMapper">
+    
+    <resultMap type="SysMeterAlarm" id="SysMeterAlarmResult">
+        <result property="id"    column="id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="meterId"    column="meter_id"    />
+        <result property="connector"    column="connector"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectSysMeterAlarmVo">
+        select id, create_time, meter_id, connector, status from sys_meter_alarm
+    </sql>
+
+    <select id="selectSysMeterAlarmList" parameterType="SysMeterAlarm" resultMap="SysMeterAlarmResult">
+        <include refid="selectSysMeterAlarmVo"/>
+        <where>  
+            <if test="meterId != null "> and meter_id = #{meterId}</if>
+            <if test="connector != null  and connector != ''"> and connector = #{connector}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysMeterAlarmById" parameterType="Long" resultMap="SysMeterAlarmResult">
+        <include refid="selectSysMeterAlarmVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysMeterAlarm" parameterType="SysMeterAlarm">
+        insert into sys_meter_alarm
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="meterId != null">meter_id,</if>
+            <if test="connector != null">connector,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="meterId != null">#{meterId},</if>
+            <if test="connector != null">#{connector},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysMeterAlarm" parameterType="SysMeterAlarm">
+        update sys_meter_alarm
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="meterId != null">meter_id = #{meterId},</if>
+            <if test="connector != null">connector = #{connector},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysMeterAlarmById" parameterType="Long">
+        delete from sys_meter_alarm where id = #{id}
+    </delete>
+
+    <delete id="deleteSysMeterAlarmByIds" parameterType="String">
+        delete from sys_meter_alarm where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

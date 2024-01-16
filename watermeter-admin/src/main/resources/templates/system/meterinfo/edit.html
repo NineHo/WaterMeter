@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改水表信息管理')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-meterInfo-edit" th:object="${sysMeterInfo}">
+            <h4 class="form-header h4">水表信息管理信息</h4>
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">用户名：</label>
+                <div class="col-sm-8">
+                    <input name="userId" th:field="*{userId}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">所属区域：</label>
+                <div class="col-sm-8">
+                    <div class="radio-box" th:each="dict : ${@dict.getType('sys_meter_address')}">
+                        <input type="radio" th:id="${'meterAddress_' + dict.dictCode}" name="meterAddress" th:value="${dict.dictValue}" th:field="*{meterAddress}">
+                        <label th:for="${'meterAddress_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">详细地址：</label>
+                <div class="col-sm-8">
+                    <input name="detailAddress" th:field="*{detailAddress}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">状态：</label>
+                <div class="col-sm-8">
+                    <div class="radio-box" th:each="dict : ${@dict.getType('sys_if_online')}">
+                        <input type="radio" th:id="${'status_' + dict.dictCode}" name="status" th:value="${dict.dictValue}" th:field="*{status}">
+                        <label th:for="${'status_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                    </div>
+                </div>
+            </div>
+            <h4 class="form-header h4">设备数据信息</h4>
+            <div class="row">
+                <div class="col-sm-12">
+                    <button type="button" class="btn btn-white btn-sm" onclick="addRow()"><i class="fa fa-plus"> 增加</i></button>
+                    <button type="button" class="btn btn-white btn-sm" onclick="sub.delRow()"><i class="fa fa-minus"> 删除</i></button>
+                    <div class="col-sm-12 select-table table-striped">
+                        <table id="bootstrap-table"></table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/meterInfo";
+        $("#form-meterInfo-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-meterInfo-edit').serialize());
+            }
+        }
+
+        $(function() {
+            var options = {
+                data: [[${sysMeterInfo.sysDeviceDataList}]],
+                pagination: false,
+                showSearch: false,
+                showRefresh: false,
+                showToggle: false,
+                showColumns: false,
+                sidePagination: "client",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'index',
+                    align: 'center',
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                    	var columnIndex = $.common.sprintf("<input type='hidden' name='index' value='%s'>", $.table.serialNumber(index));
+                    	return columnIndex + $.table.serialNumber(index);
+                    }
+                },
+                {
+                    field: 'dataValue',
+                    align: 'center',
+                    title: '水流量',
+                    formatter: function(value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='sysDeviceDataList[%s].dataValue' value='%s'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'dateTime',
+                    align: 'center',
+                    title: '接收时间',
+                    formatter: function(value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='sysDeviceDataList[%s].dateTime' value='%s'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var value = $.common.isNotEmpty(row.index) ? row.index : $.table.serialNumber(index);
+                        return '<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="sub.delRowByIndex(\'' + value + '\')"><i class="fa fa-remove"></i>删除</a>';
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+
+        function addRow() {
+            var count = $("#" + table.options.id).bootstrapTable('getData').length;
+            var row = {
+                index: $.table.serialNumber(count),
+                dataValue: "",
+                dateTime: "",
+            }
+            sub.addRow(row);
+        }
+    </script>
+</body>
+</html>
